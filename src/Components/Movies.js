@@ -2,17 +2,19 @@
 import '../App.css'
 import React, { Component } from 'react';
 import axios from 'axios';
-import { movies } from './getMovies';
+import { json } from 'react-router-dom';
 
 
-export default class  extends Component {
+
+export default class Movies extends Component {
    constructor(){
     super();
     this.state = {
         hover:'',
         page:[1],
         currPage:1,
-        movies:[]
+        movies:[],
+        favourite:[]
     }
    }
   async componentDidMount()
@@ -50,13 +52,32 @@ export default class  extends Component {
        })
      }
     handleClick = (val)=>{
-        if(val != this.state.currPage)
+        if(val !== this.state.currPage)
         {
             this.setState({
                 currPage : val
             })
         }
     }
+    handleFavourite = (movie)=>{
+             let oldmovies = JSON.parse(localStorage.getItem("movies-app")||"[]");
+             if(this.state.favourite.includes(movie.id))
+             {
+                    oldmovies = oldmovies.filter((m)=> m.id!=movie.id);
+             }
+             else{
+                    oldmovies.push(movie);
+             }
+                localStorage.setItem("movies-app",JSON.stringify(oldmovies));
+                this.handleFavouriteState();
+     }
+     handleFavouriteState=()=>{
+        let oldmovies = JSON.parse(localStorage.getItem("movies-app")||"[]");
+        let temp_ids = oldmovies.map((m)=> m.id)
+        this.setState({
+            favourite: [...temp_ids]
+        })
+     }
      
   render() {    
    // let  movie = movies.results;
@@ -77,7 +98,7 @@ export default class  extends Component {
                 {/* <p className="card-text movies-text">{moieObj.overview}</p> */} 
                 <div className="button-wrapper" style={{display:'flex',width:'100%',justifyContent:'center'}}>
                 {
-                    this.state.hover === moieObj.id && <a href="#" className="btn btn-primary movies-button">Add To Favourites</a>
+                    this.state.hover === moieObj.id && <a  className="btn btn-primary movies-button" onClick={()=>this.handleFavourite(moieObj)}>{this.state.favourite.includes(moieObj.id)?"Remove from":"Add To"} Favourites</a>
                 }
                 
                 </div>
@@ -90,14 +111,14 @@ export default class  extends Component {
         <div style={{display:"flex",justifyContent:'center'}}> 
         <nav aria-label="Page navigation example">
   <ul className="pagination">
-    <li className="page-item"><a className="page-link" href="#" onClick={this.updatedecPage}>Previous</a></li>
+    <li className="page-item"><a className="page-link"  onClick={this.updatedecPage}>Previous</a></li>
     {
         this.state.page.map((value)=>(
-            <li className="page-item"><a className="page-link" href="#" onClick={()=>this.handleClick(value)}>{value}</a></li>
+            <li key={value} className="page-item"><a className="page-link"  onClick={()=>this.handleClick(value)}>{value}</a></li>
         ))
     }
     
-    <li className="page-item"><a className="page-link" href="#" onClick={this.updateincPage}>Next</a></li>
+    <li className="page-item"><a className="page-link"  onClick={this.updateincPage}>Next</a></li>
   </ul>
 </nav>
         </div>
