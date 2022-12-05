@@ -11,7 +11,12 @@ function App() {
     <Router>
     <Navbar/>
     <Routes>
-      <Route path='/'  element={<Movies/>}/>
+    <Route path='/' exact element={
+        <div>
+          <Banner />
+          <Movies />
+        </div>}
+         />
       <Route path='/favourite' element={<Favourite/>}/>
     </Routes>
     </Router>
